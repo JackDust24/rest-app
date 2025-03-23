@@ -5,45 +5,62 @@ import {
   changeUserPassword,
   updateUser,
 } from '../repositories/profileRepository';
+import { calculateAge, hashPassword } from '../utils/helpers';
 import { User, UserProfile, EditUserProfile, Gender } from '../utils/types';
 
-const users: User[] = [];
-
-const registerUser = async (
-  email: string,
-  password: string,
-  name: string,
-  dob: Date,
-  gender: Gender,
-  address: string,
-  isSubscribed: boolean
-): Promise<void> => {
+const registerUserService = async (userData: User): Promise<void> => {
+  const hashedPassword = await hashPassword(userData.password);
   const user: User = {
     id: crypto.randomUUID(),
-    email,
-    password,
-    name,
-    dob,
-    gender,
-    address,
-    isSubscribed,
+    email: userData.email,
+    password: hashedPassword,
+    name: userData.name,
+    dob: userData.dob,
+    gender: userData.gender,
+    address: userData.address,
+    isSubscribed: userData.isSubscribed,
   };
 
-  //TODO: Add user to repository
+  await saveUser(user);
 };
 
-const getUserProfile = async (id: string): Promise<UserProfile | null> => {
-  //TODO: Get user from repository and calculate age
+const getProfileService = async (id: string): Promise<UserProfile | null> => {
+  const user = await findUserById(id);
+  if (!user) return null;
+
+  const userProfile: UserProfile = {
+    email: user.email,
+    name: user.name,
+    age: calculateAge(user.dob),
+    gender: user.gender,
+    address: user.address,
+    isSubscribed: user.isSubscribed,
+  };
+  return userProfile;
 };
 
-const updateUserProfile = async (
+const updateProfileService = async (
   id: string,
   data: EditUserProfile
 ): Promise<UserProfile | null> => {
-  //TODO: Update user
+  const user = await findUserById(id);
+  if (!user) return null;
+
+  const updatedUser = { ...user, ...data };
+
+  await updateUser(id, updatedUser);
+
+  return {
+    email: updatedUser.email,
+    name: updatedUser.name,
+    age: calculateAge(updatedUser.dob),
+    gender: updatedUser.gender,
+    address: updatedUser.address,
+    isSubscribed: updatedUser.isSubscribed,
+  };
 };
 
-const deleteUserProfile = async (id: string): Promise<boolean> => {
+const deleteProfileService = async (id: string): Promise<boolean> => {
   const user = await findUserById(id);
   if (!user) return false;
 
@@ -51,7 +68,7 @@ const deleteUserProfile = async (id: string): Promise<boolean> => {
   return true;
 };
 
-const changePassword = async (
+const changePasswordService = async (
   id: string,
   oldPassword: string,
   newPassword: string
@@ -60,9 +77,9 @@ const changePassword = async (
 };
 
 export {
-  registerUser,
-  findUserById,
-  updateUserProfile,
-  changePassword,
-  deleteUserProfile,
+  registerUserService,
+  getProfileService,
+  updateProfileService,
+  changePasswordService,
+  deleteProfileService,
 };

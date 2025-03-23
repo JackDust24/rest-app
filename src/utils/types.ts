@@ -11,7 +11,7 @@ type User = {
   isSubscribed: boolean;
 };
 
-type UserProfile = Omit<User, 'password' | ('dob' & { age: number })>;
+type UserProfile = Omit<User, 'password' | 'id' | 'dob'> & { age: number };
 
 type EditUserProfile = Pick<
   User,
