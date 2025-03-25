@@ -19,14 +19,14 @@ const router = Router();
 router.post('/register', validateRequest(createUserSchema), registerUser);
 router.get('/profile/:id', verifyToken, getUserProfile);
 router.put(
-  '/editProfile/:id',
+  '/edit-profile/:id',
   verifyToken,
   validateRequest(updateUserSchema),
   editUserProfile
 );
-router.delete('/editProfile/:id', verifyToken, deleteProfile);
+router.delete('/edit-profile/:id', verifyToken, deleteProfile);
 router.post(
-  '/password-change/:id',
+  '/change-password/:id',
   verifyToken,
   validateRequest(changePasswordSchema),
   changePassword

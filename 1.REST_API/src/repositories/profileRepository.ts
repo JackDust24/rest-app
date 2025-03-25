@@ -1,30 +1,6 @@
+import { mockID, users } from '../data/mockUsers';
 import { comparePasswords, hashPassword } from '../utils/helpers';
 import { User, EditUserProfile } from '../utils/types';
-
-const users: User[] = [
-  {
-    id: '1e9324b9-17bc-40c5-8414-95352e665be7',
-    email: 'john.doe@example.com',
-    password: 'password123',
-    name: 'John Doe',
-    dob: new Date('1990-05-15'),
-    gender: 'Male',
-    address: '123 Main St, Springfield',
-    isSubscribed: true,
-  },
-  {
-    id: '2d9314c0-27bd-40d1-92f6-cdfaa89d982f',
-    email: 'jane.doe@example.com',
-    password: 'password456',
-    name: 'Jane Doe',
-    dob: new Date('1985-07-25'),
-    gender: 'Female',
-    address: '456 Elm St, Springfield',
-    isSubscribed: false,
-  },
-];
-
-const mockID = users[0].id;
 
 const saveUser = async (user: User): Promise<void> => {
   const existingUser = users.find((u) => u.email === user.email);
