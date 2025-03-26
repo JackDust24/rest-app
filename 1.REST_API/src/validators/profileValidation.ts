@@ -1,10 +1,12 @@
 import Joi from 'joi';
 import { password } from './passwordValidation';
 import { Gender } from '../utils/types';
+import { capitaliseFirstLetter } from '../utils/helpers';
 
 const genderValidator = (value: any, helpers: Joi.CustomHelpers) => {
+  const capitaliseValue = capitaliseFirstLetter(value) as any;
   const validGenders: Gender[] = ['Male', 'Female', 'Other'];
-  if (!validGenders.includes(value)) {
+  if (!validGenders.includes(capitaliseValue)) {
     return helpers.message({
       custom: `Gender must be one of: ${validGenders.join(', ')}`,
     });
