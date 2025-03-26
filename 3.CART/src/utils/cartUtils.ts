@@ -1,5 +1,4 @@
 import { Cart } from '../models/Cart';
-import { Discount } from '../models/Discount';
 
 export class CartUtils {
   constructor(private cart: Cart) {}
@@ -24,20 +23,19 @@ export class CartUtils {
     return this.cart.getTotalQuantity();
   }
 
-  calculateSubtotal(productPriceMap: Record<string, number>): number {
+  calculateSubtotal(): number {
     return this.cart.getItems().reduce((total, item) => {
-      const price = productPriceMap[item.productId];
-      return total + price * item.quantity;
+      return total + item.price * item.quantity;
     }, 0);
   }
 
-  calculateTotal(productPriceMap: Record<string, number>): number {
-    const subtotal = this.calculateSubtotal(productPriceMap);
+  calculateTotal(): number {
+    const subtotal = this.calculateSubtotal();
     const discountAmount = this.cart
       .getDiscounts()
       .reduce((total, discount) => {
         return total + discount.calculateDiscountAmount(subtotal - total);
       }, 0);
-    return subtotal - discountAmount;
+    return Math.max(0, subtotal - discountAmount);
   }
 }

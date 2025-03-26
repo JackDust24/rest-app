@@ -4,6 +4,7 @@ import { Discount } from './Discount';
 export type CartItem = {
   productId: string;
   quantity: number;
+  price: number;
 };
 
 export class Cart {
@@ -16,7 +17,7 @@ export class Cart {
     this.freebies = [];
   }
 
-  addItem(productId: string, quantity: number) {
+  addItem(productId: string, quantity: number, price: number): void {
     const existingItem = this.cartItems.find(
       (item) => item.productId === productId
     );
@@ -24,12 +25,12 @@ export class Cart {
       existingItem.quantity += quantity;
       return;
     } else {
-      this.cartItems.push({ productId, quantity });
+      this.cartItems.push({ productId, quantity, price });
       this.applyFreebieRules();
     }
   }
 
-  updateItem(productId: string, quantity: number) {
+  updateItem(productId: string, quantity: number): void {
     const existingItem = this.cartItems.find(
       (item) => item.productId === productId
     );
@@ -46,11 +47,13 @@ export class Cart {
     this.applyFreebieRules();
   }
 
-  clearCart(): void {
+  clear(): void {
     this.cartItems = [];
+    this.discounts = [];
+    this.freebies = [];
   }
 
-  getTotalQuantity() {
+  getTotalQuantity(): number {
     return this.cartItems.reduce((total, item) => total + item.quantity, 0);
   }
 
@@ -68,12 +71,12 @@ export class Cart {
     }
   }
 
+  /* FREEBIES */
   addFreebieRule(freebie: Freebie): void {
     this.freebies.push(freebie);
     this.applyFreebieRules();
   }
 
-  // Private implementation
   private applyFreebieRules(): void {
     this.freebies.forEach((freebie) => {
       const hasRequiredProduct = this.cartItems.some(
@@ -87,6 +90,7 @@ export class Cart {
         this.cartItems.push({
           productId: freebie.freebieProductId,
           quantity: freebie.quantity,
+          price: 0,
         });
       }
     });

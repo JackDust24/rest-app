@@ -1,13 +1,11 @@
 import { Cart } from '../models/Cart';
-import {
-  Discount,
-  FixedDiscount,
-  PercentageDiscount,
-} from '../models/Discount';
+import { Discount } from '../models/Discount';
 import { Freebie } from '../models/Freebie';
+import { CartUtils } from '../utils/cartUtils';
 
 export class CartService {
   private carts: Map<string, Cart> = new Map();
+  private utils: Map<string, CartUtils> = new Map(); // Track utils instances
   private lastCartId: number = 0;
 
   createCart(): string {
@@ -16,10 +14,15 @@ export class CartService {
     return cartId;
   }
 
-  addItem(cartId: string, productId: string, quantity: number = 1): void {
+  addItem(
+    cartId: string,
+    productId: string,
+    quantity: number = 1,
+    price: number
+  ): void {
     const cart = this.carts.get(cartId);
     if (!cart) return;
-    cart.addItem(productId, quantity);
+    cart.addItem(productId, quantity, price);
   }
 
   updateItem(cartId: string, productId: string, quantity: number): void {
@@ -32,10 +35,6 @@ export class CartService {
     const cart = this.carts.get(cartId);
     if (!cart) return;
     cart.removeItem(productId);
-  }
-
-  clearCart(cartId: string): void {
-    this.carts.delete(cartId);
   }
 
   // Discounts
@@ -60,7 +59,21 @@ export class CartService {
   }
 
   // For the utilities
-  getCart(cartId: string): Cart | undefined {
-    return this.carts.get(cartId);
+  getCartUtils(cartId: string): CartUtils | undefined {
+    const cart = this.carts.get(cartId);
+    return cart ? new CartUtils(cart) : undefined;
+  }
+
+  clearCart(cartId: string): boolean {
+    const cart = this.carts.get(cartId);
+    if (!cart) return false;
+
+    cart.clear();
+    return true;
+  }
+
+  // Completely removes cart
+  destroyCart(cartId: string): boolean {
+    return this.carts.delete(cartId);
   }
 }
